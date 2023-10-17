@@ -5,7 +5,7 @@ export type OrderDocument = HydratedDocument<Order>
 @Schema()
 export class Order {
   @Prop()
-  acconunt_id: string;
+  account_id: string;
   @Prop()
   asset_id: string;
   @Prop()
