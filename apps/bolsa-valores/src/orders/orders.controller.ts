@@ -6,18 +6,28 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Controller()
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   @GrpcMethod('OrderService')
-  CreateOrder(@Payload() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async CreateOrder(@Payload() createOrderDto: CreateOrderDto) {
+    const order = await this.ordersService.create(createOrderDto);
+
+    return {
+      order: {
+        order_id: order.id.toString(),
+        account_id: order.account_id,
+        asset_id: order.asset_id,
+        quantity: order.quantity,
+        status: order.status,
+      }
+    }
   }
 
   @GrpcMethod('OrderService')
-  async FindAllOrders(@Payload()  findAllOrderDto: {accont_id: string}) {
-     const orders = await this.ordersService.findAll(findAllOrderDto.accont_id);
-     return{
-      orders: orders.map(order =>({
+  async FindAllOrders(@Payload() findAllOrderDto: { accont_id: string }) {
+    const orders = await this.ordersService.findAll(findAllOrderDto.accont_id);
+    return {
+      orders: orders.map(order => ({
         order_id: order.id.toString(),
         account_id: order.account_id,
         asset_id: order.asset_id,
@@ -25,12 +35,22 @@ export class OrdersController {
         status: order.status,
 
       }))
-     }
+    }
   }
 
   @GrpcMethod('OrderService')
-  FindOneOrder(@Payload() findOneOrderDto: {order_id: number}) {
-    return this.ordersService.findOne(findOneOrderDto.order_id);
+  async FindOneOrder(@Payload() findOneOrderDto: { order_id: number }) {
+    const order = await this.ordersService.findOne(findOneOrderDto.order_id);
+
+    return {
+      order: {
+        order_id: order.id.toString(),
+        account_id: order.account_id,
+        asset_id: order.asset_id,
+        quantity: order.quantity,
+        status: order.status,
+      }
+    }
   }
 
   @MessagePattern('updateOrder')
